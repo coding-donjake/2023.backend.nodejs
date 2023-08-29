@@ -1,0 +1,12 @@
+POST http://localhost:5000/user-information/create
+Content-Type: application/json
+
+{
+  "userId": "8f4d4506-8abd-4653-93c7-a96bb90774e4",
+  "lastname": "Grant",
+  "firstname": "Mark",
+  "middlename": "Spencer",
+  "suffix": "",
+  "gender": "male",
+  "birthdate": "2000-01-01T00:00:00Z"
+}

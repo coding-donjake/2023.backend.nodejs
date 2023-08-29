@@ -41,17 +41,16 @@ class UserRouter {
 
   private setLoginRoute = async () => {
     this.router.post(this.loginRoute, async (req: Request, res: Response) => {
-      req.body.password = await this.hashService.hashPassword(req.body.password, 10);
       try {
         console.log(`Login attempt using ${req.body.username}`);
         const {username, password} = req.body;
         const isAuthenticated = await this.authService.authenticateUser(username, password);
         if (!isAuthenticated) {
-          res.status(401);
+          res.status(401).send();
           return;
         }
         console.log(`User ${username} successfully logged in.`);
-        res.status(200);
+        res.status(200).send();
       } catch (error) {
         console.error(error);
         res.status(500).json({
