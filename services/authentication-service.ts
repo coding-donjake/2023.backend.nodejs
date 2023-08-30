@@ -1,3 +1,4 @@
+import express, { Request, Response } from 'express';
 import PrismaService from './prisma-service';
 import HashService from './hash-service';
 import jwt from 'jsonwebtoken';
@@ -33,6 +34,19 @@ class AuthenticationService {
   public generateAuthenticationToken = (userId: string, expiration: String) => {
     const secretKey = process.env.SECRET_KEY;
     const token: String = jwt.sign({userId}, process.env.SECRET_KEY!);
+  }
+
+  public verifyToken(req: Request, res: Response, next: any) {
+    const token = req.header('Authorization')?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided.' });
+    }
+    jwt.verify(token, process.env.SECRET_KEY!, (err, decoded) => {
+      if (err) {
+        return res.status(403).json({ message: 'Failed to authenticate token.' });
+      }
+      next();
+    });
   }
 }
 
