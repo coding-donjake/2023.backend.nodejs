@@ -12,10 +12,12 @@ class LogService {
     return LogService.instance;
   }
 
-  public logEvent(type: string, userId: string, data: object) {
+  public logEvent(type: string, userId: string, content: object) {
     this.prismaService.prisma.log.create({
       data: {
-        type
+        type: type,
+        content: content,
+        userId: userId,
       }
     });
   }

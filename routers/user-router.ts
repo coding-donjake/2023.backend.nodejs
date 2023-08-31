@@ -12,11 +12,13 @@ class UserRouter {
 
   private createRoute: string = '/create';
   private loginRoute: string = '/login';
+  private updateRoute: string = '/update';
 
   constructor() {
     this.router = Router();
     this.setCreateRoute();
     this.setLoginRoute();
+    this.setUpdateRoute();
   }
 
   private setCreateRoute = async () => {
@@ -44,13 +46,32 @@ class UserRouter {
       try {
         console.log(`Login attempt using ${req.body.username}`);
         const {username, password} = req.body;
-        const isAuthenticated = await this.authService.authenticateUser(username, password);
-        if (!isAuthenticated) {
+        const user = await this.authService.authenticateUser(username, password);
+        if (!user) {
           res.status(401).send();
           return;
         }
         console.log(`User ${username} successfully logged in.`);
-        res.status(200).json({ authKey: this.authService.generateAuthenticationToken(username, '') });
+        res.status(200).json({
+          accessToken: this.authService.generateAccessToken(user, process.env.TOKEN_DURATION!),
+          refreshToken: this.authService.generateRefreshToken(user),
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({
+          status: 'server error',
+          msg: error,
+        });
+      }
+    });
+  }
+
+  private setUpdateRoute = async () => {
+    this.router.post(this.updateRoute, this.authService.verifyToken, async (req: Request, res: Response) => {
+      try {
+        console.log(req.body.decodedToken);
+        // console.log(`Updating user ${req.body.id} by ${}`);
+        res.status(200).send();
       } catch (error) {
         console.error(error);
         res.status(500).json({

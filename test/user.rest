@@ -16,3 +16,13 @@ Content-Type: application/json
   "username": "staff",
   "password": "1234"
 }
+
+###
+
+POST http://localhost:5000/user/update
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhmNGQ0NTA2LThhYmQtNDY1My05M2M3LWE5NmJiOTA3NzRlNCIsInVzZXJuYW1lIjoic3RhZmYiLCJwYXNzd29yZCI6IiQyYiQxMCROVm5IazFQL1BTaTZYVGh6Q0N1SVYuUjBvOVF1TGM5Q0JNcWRJem5mN3kuYmRrTGExWDRtQyIsInN0YXR1cyI6Im9rIiwiaWF0IjoxNjkzNDkwOTU4LCJleHAiOjE2OTM0OTQ1NTh9.qoWYn4MwXOGKcjYlssFeEkX5byYrrL94d6snyGvGZuc
+
+{
+  "username": "staff",
+  "password": "1234"
+}

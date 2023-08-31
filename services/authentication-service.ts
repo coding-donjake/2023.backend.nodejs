@@ -22,29 +22,32 @@ class AuthenticationService {
       const user = await this.prismaService.prisma.user.findUnique({
         where: {username: username},
       });
-      if (!user) { return false; }
+      if (!user) return false;
       const passwordMatches = await this.hashService.comparePasswords(password, user.password);
-      return passwordMatches;
+      if (!passwordMatches) return false;
+      return user;
     } catch (error) {
       console.error(error);
       return false;
     }
   }
 
-  public generateAuthenticationToken = (content: string, expiration: String) => {
-    const secretKey = process.env.SECRET_KEY;
-    const token: String = jwt.sign({content}, process.env.SECRET_KEY!);
+  public generateAccessToken = (content: object, expiration: string) => {
+    const token: string = jwt.sign(content, process.env.SECRET_KEY!, {expiresIn: expiration});
+    return token;
+  }
+
+  public generateRefreshToken = (content: object) => {
+    const token: string = jwt.sign(content, process.env.SECRET_KEY!);
+    return token;
   }
 
   public verifyToken(req: Request, res: Response, next: any) {
     const token = req.header('Authorization')?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ message: 'No token provided.' });
-    }
+    if (!token) return res.status(401).json({ message: 'No token provided.' });
     jwt.verify(token, process.env.SECRET_KEY!, (err, decoded) => {
-      if (err) {
-        return res.status(403).json({ message: 'Failed to authenticate token.' });
-      }
+      if (err) return res.status(403).json({ message: 'Failed to authenticate token.' });
+      req.body.decodedToken = decoded;
       next();
     });
   }
