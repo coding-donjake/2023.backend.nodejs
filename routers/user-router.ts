@@ -50,7 +50,7 @@ class UserRouter {
           return;
         }
         console.log(`User ${username} successfully logged in.`);
-        res.status(200).send();
+        res.status(200).json({ authKey: this.authService.generateAuthenticationToken(username, '') });
       } catch (error) {
         console.error(error);
         res.status(500).json({

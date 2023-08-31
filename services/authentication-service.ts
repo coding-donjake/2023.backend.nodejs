@@ -31,9 +31,9 @@ class AuthenticationService {
     }
   }
 
-  public generateAuthenticationToken = (userId: string, expiration: String) => {
+  public generateAuthenticationToken = (content: string, expiration: String) => {
     const secretKey = process.env.SECRET_KEY;
-    const token: String = jwt.sign({userId}, process.env.SECRET_KEY!);
+    const token: String = jwt.sign({content}, process.env.SECRET_KEY!);
   }
 
   public verifyToken(req: Request, res: Response, next: any) {
