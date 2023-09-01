@@ -67,10 +67,9 @@ class UserRouter {
   }
 
   private setUpdateRoute = async () => {
-    this.router.post(this.updateRoute, this.authService.verifyToken, async (req: Request, res: Response) => {
+    this.router.post(this.updateRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
-        console.log(req.body.decodedToken);
-        // console.log(`Updating user ${req.body.id} by ${}`);
+        this.prismaService.prisma.user // complete for update
         res.status(200).send();
       } catch (error) {
         console.error(error);
