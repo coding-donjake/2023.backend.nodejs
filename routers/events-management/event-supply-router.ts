@@ -1,67 +1,37 @@
 import { Request, Response } from 'express';
 import { Router } from 'express';
-import PrismaService from '../services/prisma-service';
-import HashService from '../services/hash-service';
-import AuthenticationService from '../services/authentication-service';
-import LogService from '../services/log-service';
+import AuthenticationService from '../../services/authentication-service';
+import LogService from '../../services/log-service';
+import PrismaService from '../../services/prisma-service';
 
-class UserRouter {
+class EventSupplyRouter {
   public router: Router;
   private authService: AuthenticationService = AuthenticationService.getInstance();
-  private hashService: HashService = HashService.getInstance();
   private logService: LogService = LogService.getInstance();
   private prismaService: PrismaService = PrismaService.getInstance();
 
   private createRoute: string = '/create';
-  private loginRoute: string = '/login';
   private removeRoute: string = '/remove';
   private updateRoute: string = '/update';
 
   constructor() {
     this.router = Router();
     this.setCreateRoute();
-    this.setLoginRoute();
     this.setRemoveRoute();
     this.setUpdateRoute();
   }
 
   private setCreateRoute = async () => {
-    this.router.post(this.createRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
-      req.body.data.password = await this.hashService.hashPassword(req.body.data.password, 10);
+    this.router.post(this.createRoute, async (req: Request, res: Response) => {
       try {
-        console.log(`Creating user using the following data: ${JSON.stringify(req.body.data)}`);
-        const user = await this.prismaService.prisma.user.create({
+        console.log(`Creating event supply using the following data: ${JSON.stringify(req.body.data)}`);
+        const eventSupply = await this.prismaService.prisma.eventSupply.create({
           data: req.body.data,
         });
-        console.log(`User created: ${JSON.stringify(user)}`);
-        req.body.data.id = user.id;
+        console.log(`Event supply created: ${JSON.stringify(eventSupply)}`);
+        req.body.data.id = eventSupply.id;
         this.logService.logEvent('create', req.body.decodedToken.id, req.body.data);
-        res.status(200).json({ id: user.id });
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({
-          status: 'server error',
-          msg: error,
-        });
-      }
-    });
-  }
-
-  private setLoginRoute = async () => {
-    this.router.post(this.loginRoute, async (req: Request, res: Response) => {
-      try {
-        console.log(`Login attempt using ${req.body.username}`);
-        const {username, password} = req.body;
-        const user = await this.authService.authenticateUser(username, password);
-        if (!user) {
-          res.status(401).send();
-          return;
-        }
-        console.log(`User ${username} successfully logged in.`);
-        res.status(200).json({
-          accessToken: this.authService.generateAccessToken(user, process.env.TOKEN_DURATION!),
-          refreshToken: this.authService.generateRefreshToken(user),
-        });
+        res.status(200).json({ id: eventSupply.id });
       } catch (error) {
         console.error(error);
         res.status(500).json({
@@ -75,13 +45,13 @@ class UserRouter {
   private setRemoveRoute = async () => {
     this.router.post(this.removeRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
-        console.log(`Removing user ${req.body.id}.`);
-        let result = await this.prismaService.prisma.user.update({
+        console.log(`Removing event supply ${req.body.id}.`);
+        let result = await this.prismaService.prisma.eventSupply.update({
           where: {id: req.body.id},
           data: {status: 'removed'},
         });
         if (!result) return res.status(400).send();
-        console.log(`User ${req.body.id} removed.`);
+        console.log(`Event supply ${req.body.id} removed.`);
         req.body.data.id = req.body.id;
         this.logService.logEvent('remove', req.body.decodedToken.id, req.body.data);
         res.status(200).send();
@@ -98,13 +68,13 @@ class UserRouter {
   private setUpdateRoute = async () => {
     this.router.post(this.updateRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
-        console.log(`Updating user ${req.body.id} using the following data: ${JSON.stringify(req.body.data)}`);
-        let result = await this.prismaService.prisma.user.update({
+        console.log(`Updating event supply ${req.body.id} using the following data: ${JSON.stringify(req.body.data)}`);
+        let result = await this.prismaService.prisma.eventSupply.update({
           where: {id: req.body.id},
           data: req.body.data,
         });
         if (!result) return res.status(400).send();
-        console.log(`User ${req.body.id} updated.`);
+        console.log(`Event supply ${req.body.id} updated.`);
         req.body.data.id = req.body.id;
         this.logService.logEvent('update', req.body.decodedToken.id, req.body.data);
         res.status(200).send();
@@ -119,4 +89,4 @@ class UserRouter {
   }
 }
 
-export default UserRouter;
+export default EventSupplyRouter;

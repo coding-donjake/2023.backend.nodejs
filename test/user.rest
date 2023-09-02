@@ -1,10 +1,13 @@
 POST http://localhost:5000/user/create
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJjNzhlOWMzLTliNGQtNGIyYS1iN2VmLTA3ZGE4NTE1YjE2ZSIsInVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6IiQyYiQxMCR2U2tDbjNLMjdKLk1JMjdobTVQbTRlMFM3SWxQa1lWalRrWU8zRmQubUg3Zy9JVjRTWFhuYSIsInN0YXR1cyI6Im9rIiwiaWF0IjoxNjkzNjY0Njg1LCJleHAiOjE2OTM2NjgyODV9.AbHiZh-2Afa8nfamA92GcGLZJyjsED22eCDi248hXiQ
 Content-Type: application/json
 
 {
-  "username": "staff",
-  "password": "1234",
-  "status": "ok"
+  "data": {
+    "username": "staff",
+    "password": "1234",
+    "status": "ok"
+  }
 }
 
 ###
@@ -13,14 +16,15 @@ POST http://localhost:5000/user/login
 Content-Type: application/json
 
 {
-  "username": "staff",
+  "username": "admin",
   "password": "1234"
 }
 
 ###
 
 POST http://localhost:5000/user/update
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhmNGQ0NTA2LThhYmQtNDY1My05M2M3LWE5NmJiOTA3NzRlNCIsInVzZXJuYW1lIjoic3RhZmYiLCJwYXNzd29yZCI6IiQyYiQxMCROVm5IazFQL1BTaTZYVGh6Q0N1SVYuUjBvOVF1TGM5Q0JNcWRJem5mN3kuYmRrTGExWDRtQyIsInN0YXR1cyI6Im9rIiwiaWF0IjoxNjkzNDkwOTU4LCJleHAiOjE2OTM0OTQ1NTh9.qoWYn4MwXOGKcjYlssFeEkX5byYrrL94d6snyGvGZuc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhmNGQ0NTA2LThhYmQtNDY1My05M2M3LWE5NmJiOTA3NzRlNCIsInVzZXJuYW1lIjoic3RhZmYiLCJwYXNzd29yZCI6IiQyYiQxMCROVm5IazFQL1BTaTZYVGh6Q0N1SVYuUjBvOVF1TGM5Q0JNcWRJem5mN3kuYmRrTGExWDRtQyIsInN0YXR1cyI6Im9rIiwiaWF0IjoxNjkzNjUyODUzLCJleHAiOjE2OTM2NTY0NTN9.6zlVvcxwSIAH4Br5YH-MyEmlVUh7484H8TLJAg_3mWo
+Content-Type: application/json
 
 {
   "username": "staff",

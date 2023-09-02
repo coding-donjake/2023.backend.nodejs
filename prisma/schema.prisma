@@ -24,7 +24,7 @@ model Log {
   id       String   @id @default(uuid())
   datetime DateTime @default(now())
   type     String   @db.VarChar(20)
-  content  Json
+  content  Json     @db.Json
   User     User?    @relation(fields: [userId], references: [id])
   userId   String   @unique
 }
@@ -39,6 +39,8 @@ model User {
   Log             Log?
   // assets management system
   Borrowing       Borrowing[]
+  // events management system
+  Customer        Customer?
 }
 
 model UserInformation {
@@ -72,6 +74,7 @@ enum UserStatus {
   unverified
   ok
   deactivated
+  removed
   suspended
 }
 
@@ -108,4 +111,136 @@ enum BorrowingStatus {
   pending
   borrowed
   returned
+}
+
+// events management system
+
+model Customer {
+  id      String         @id @default(uuid())
+  address String         @db.Text
+  phone   String         @db.VarChar(20)
+  email   String         @db.VarChar(255)
+  status  CustomerStatus
+  User    User?          @relation(fields: [userId], references: [id])
+  userId  String         @unique
+  Event   Event?         @relation(fields: [eventId], references: [id])
+  eventId String?
+}
+
+model Event {
+  id            String        @id @default(uuid())
+  datetimeStart DateTime
+  datetimeEnd   DateTime
+  type          String        @db.VarChar(20)
+  name          String        @db.VarChar(255)
+  address       String        @db.Text
+  status        EventStatus
+  Customer      Customer[]
+  EventSupply   EventSupply[]
+}
+
+model EventSupply {
+  id       String            @id @default(uuid())
+  quantity Int
+  status   EventSupplyStatus
+  Event    Event?            @relation(fields: [eventId], references: [id])
+  eventId  String?
+  Supply   Supply?           @relation(fields: [supplyId], references: [id])
+  supplyId String?
+}
+
+model Order {
+  id              String        @id @default(uuid())
+  datetimeOrdered DateTime
+  datetimeArrived DateTime
+  status          OrderStatus
+  OrderSupply     OrderSupply[]
+  Supplier        Supplier?     @relation(fields: [supplierId], references: [id])
+  supplierId      String?
+}
+
+model OrderSupply {
+  id       String            @id @default(uuid())
+  quantity Int
+  status   OrderSupplyStatus
+  Order    Order?            @relation(fields: [orderId], references: [id])
+  orderId  String?
+  Supply   Supply?           @relation(fields: [supplyId], references: [id])
+  supplyId String?
+}
+
+model Supplier {
+  id      String         @id @default(uuid())
+  name    String         @db.VarChar(255)
+  address String         @db.Text
+  phone   String         @db.VarChar(20)
+  email   String         @db.VarChar(255)
+  status  SupplierStatus
+  Order   Order[]
+}
+
+model Supply {
+  id          String        @id @default(uuid())
+  name        String        @db.VarChar(255)
+  brand       String        @db.VarChar(255)
+  type        String        @db.VarChar(255)
+  stock       Int
+  status      SupplyStatus
+  EventSupply EventSupply[]
+  OrderSupply OrderSupply[]
+}
+
+model Task {
+  id     String     @id @default(uuid())
+  name   String     @db.VarChar(255)
+  status TaskStatus
+}
+
+enum CustomerStatus {
+  ok
+  flagged
+  removed
+}
+
+enum EventStatus {
+  active
+  cancelled
+  completed
+  removed
+  unpaid
+}
+
+enum EventSupplyStatus {
+  ok
+  removed
+}
+
+enum OrderStatus {
+  active
+  arrived
+  cancelled
+  removed
+}
+
+enum OrderSupplyStatus {
+  ok
+  removed
+}
+
+enum SupplierStatus {
+  ok
+  flagged
+  removed
+}
+
+enum SupplyStatus {
+  ok
+  removed
+}
+
+enum TaskStatus {
+  active
+  completed
+  onhold
+  removed
 }

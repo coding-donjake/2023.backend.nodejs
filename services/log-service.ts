@@ -12,8 +12,11 @@ class LogService {
     return LogService.instance;
   }
 
-  public logEvent(type: string, userId: string, content: object) {
-    this.prismaService.prisma.log.create({
+  public logEvent = async (type: string, userId: string, content: object) => {
+    console.log(`Logging ${JSON.stringify(content)}`);
+    console.log(`Log type ${type}`);
+    console.log(`Log operator ${userId}`);
+    await this.prismaService.prisma.log.create({
       data: {
         type: type,
         content: content,
