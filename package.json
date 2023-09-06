@@ -6,8 +6,11 @@
   "scripts": {
     "migrate:init": "npx prisma migrate dev --name init",
     "migrate:update": "npx prisma migrate dev --name update",
+    "migrate:deploy": "npx prisma migrate deploy",
+    "migrate:seed": "ts-node prisma/seed.ts",
     "dev": "nodemon",
-    "start": "ts-node"
+    "start": "ts-node",
+    "setup": "npm run migrate:deploy && npm run migrate:seed"
   },
   "keywords": [],
   "author": "",
