@@ -123,8 +123,7 @@ model Customer {
   status  CustomerStatus
   User    User?          @relation(fields: [userId], references: [id])
   userId  String         @unique
-  Event   Event?         @relation(fields: [eventId], references: [id])
-  eventId String?
+  Event   Event[]
 }
 
 model Event {
@@ -135,7 +134,8 @@ model Event {
   name          String        @db.VarChar(255)
   address       String        @db.Text
   status        EventStatus
-  Customer      Customer[]
+  Customer      Customer?     @relation(fields: [customerId], references: [id])
+  customerId    String?
   EventSupply   EventSupply[]
 }
 
