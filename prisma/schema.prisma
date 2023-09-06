@@ -26,7 +26,7 @@ model Log {
   type     String   @db.VarChar(20)
   content  Json     @db.Json
   User     User?    @relation(fields: [userId], references: [id])
-  userId   String   @unique
+  userId   String?
 }
 
 model User {
@@ -36,7 +36,7 @@ model User {
   status          UserStatus       @default(unverified)
   UserInformation UserInformation?
   Admin           Admin?
-  Log             Log?
+  Log             Log[]
   // assets management system
   Borrowing       Borrowing[]
   // events management system
@@ -142,7 +142,7 @@ model Event {
 model EventSupply {
   id       String            @id @default(uuid())
   quantity Int
-  status   EventSupplyStatus
+  status   EventSupplyStatus @default(ok)
   Event    Event?            @relation(fields: [eventId], references: [id])
   eventId  String?
   Supply   Supply?           @relation(fields: [supplyId], references: [id])
@@ -163,7 +163,7 @@ model Order {
 model OrderSupply {
   id       String            @id @default(uuid())
   quantity Int
-  status   OrderSupplyStatus
+  status   OrderSupplyStatus @default(ok)
   Order    Order?            @relation(fields: [orderId], references: [id])
   orderId  String?
   Supply   Supply?           @relation(fields: [supplyId], references: [id])
@@ -186,7 +186,7 @@ model Supply {
   brand       String        @db.VarChar(255)
   type        String        @db.VarChar(255)
   stock       Int
-  status      SupplyStatus
+  status      SupplyStatus  @default(ok)
   EventSupply EventSupply[]
   OrderSupply OrderSupply[]
 }
@@ -194,7 +194,7 @@ model Supply {
 model Task {
   id     String     @id @default(uuid())
   name   String     @db.VarChar(255)
-  status TaskStatus
+  status TaskStatus @default(active)
 }
 
 enum CustomerStatus {

@@ -11,18 +11,20 @@ class SupplyRouter {
   private prismaService: PrismaService = PrismaService.getInstance();
 
   private createRoute: string = '/create';
+  private getRoute: string = '/get';
   private removeRoute: string = '/remove';
   private updateRoute: string = '/update';
 
   constructor() {
     this.router = Router();
     this.setCreateRoute();
+    this.setGetRoute();
     this.setRemoveRoute();
     this.setUpdateRoute();
   }
 
   private setCreateRoute = async () => {
-    this.router.post(this.createRoute, async (req: Request, res: Response) => {
+    this.router.post(this.createRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
         console.log(`Creating supply using the following data: ${JSON.stringify(req.body.data)}`);
         const supply = await this.prismaService.prisma.supply.create({
@@ -32,6 +34,23 @@ class SupplyRouter {
         req.body.data.id = supply.id;
         this.logService.logEvent('create', req.body.decodedToken.id, req.body.data);
         res.status(200).json({ id: supply.id });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({
+          status: 'server error',
+          msg: error,
+        });
+      }
+    });
+  }
+
+  private setGetRoute = async () => {
+    this.router.get(this.getRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
+      try {
+        let result = await this.prismaService.prisma.supply.findMany();
+        if (!result) return res.status(400).send();
+        console.log(`${result.length} supplies send to user ${req.body.decodedToken.id}.`);
+        res.status(200).json({data: result});
       } catch (error) {
         console.error(error);
         res.status(500).json({

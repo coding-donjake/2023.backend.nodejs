@@ -22,7 +22,7 @@ class CustomerRouter {
   }
 
   private setCreateRoute = async () => {
-    this.router.post(this.createRoute, async (req: Request, res: Response) => {
+    this.router.post(this.createRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
         console.log(`Creating customer using the following data: ${JSON.stringify(req.body.data)}`);
         const customer = await this.prismaService.prisma.customer.create({
