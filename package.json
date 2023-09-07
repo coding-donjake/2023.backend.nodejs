@@ -4,13 +4,14 @@
   "description": "",
   "main": "app.ts",
   "scripts": {
-    "migrate:init": "npx prisma migrate dev --name init",
-    "migrate:update": "npx prisma migrate dev --name update",
     "migrate:deploy": "npx prisma migrate deploy",
+    "migrate:generate": "npx prisma generate",
+    "migrate:init": "npx prisma migrate dev --name init",
     "migrate:seed": "ts-node prisma/seed.ts",
+    "migrate:update": "npx prisma migrate dev --name update",
     "dev": "nodemon",
-    "start": "ts-node",
-    "setup": "npm run migrate:deploy && npm run migrate:seed"
+    "setup": "npm run migrate:deploy && npm run migrate:seed",
+    "start": "ts-node"
   },
   "keywords": [],
   "author": "",

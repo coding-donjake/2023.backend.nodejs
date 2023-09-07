@@ -13,15 +13,17 @@ class UserRouter {
   private prismaService: PrismaService = PrismaService.getInstance();
 
   private createRoute: string = '/create';
+  private getRoute: string = '/get';
   private loginRoute: string = '/login';
-  private removeRoute: string = '/remove';
+  private searchRoute: string = '/search';
   private updateRoute: string = '/update';
 
   constructor() {
     this.router = Router();
     this.setCreateRoute();
+    this.setGetRoute();
     this.setLoginRoute();
-    this.setRemoveRoute();
+    this.setSearchRoute();
     this.setUpdateRoute();
   }
 
@@ -37,6 +39,44 @@ class UserRouter {
         req.body.data.id = user.id;
         this.logService.logEvent('create', req.body.decodedToken.id, req.body.data);
         res.status(200).json({ id: user.id });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({
+          status: 'server error',
+          msg: error,
+        });
+      }
+    });
+  }
+
+  private setGetRoute = async () => {
+    this.router.get(this.getRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
+      try {
+        let result = await this.prismaService.prisma.user.findMany({
+          where: {
+            OR: [
+              {status: 'ok'},
+              {status: 'unverified'},
+            ],
+          },
+          select: {
+            username: true,
+            UserInformation: {
+              select: {
+                lastname: true,
+                firstname: true,
+                middlename: true,
+                suffix: true,
+                gender: true,
+                birthdate: true,
+                userId: true,
+              },
+            },
+          },
+        });
+        if (!result) return res.status(400).send();
+        console.log(`${result.length} users send to user ${req.body.decodedToken.id}.`);
+        res.status(200).json({data: result});
       } catch (error) {
         console.error(error);
         res.status(500).json({
@@ -72,19 +112,40 @@ class UserRouter {
     });
   }
 
-  private setRemoveRoute = async () => {
-    this.router.post(this.removeRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
+  private setSearchRoute = async () => {
+    this.router.get(this.searchRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
-        console.log(`Removing user ${req.body.id}.`);
-        let result = await this.prismaService.prisma.user.update({
-          where: {id: req.body.id},
-          data: {status: 'removed'},
+        let result = await this.prismaService.prisma.user.findMany({
+          where: {
+            OR: [
+              {status: 'ok'},
+              {status: 'unverified'},
+            ],
+          },
+          select: {
+            username: true,
+            UserInformation: {
+              where: {
+                OR: [
+                  {lastname: req.body.key},
+                  {firstname: req.body.key},
+                  {middlename: req.body.key},
+                ],
+              },
+              select: {
+                lastname: true,
+                firstname: true,
+                middlename: true,
+                suffix: true,
+                gender: true,
+                birthdate: true,
+              },
+            },
+          },
         });
         if (!result) return res.status(400).send();
-        console.log(`User ${req.body.id} removed.`);
-        req.body.data.id = req.body.id;
-        this.logService.logEvent('remove', req.body.decodedToken.id, req.body.data);
-        res.status(200).send();
+        console.log(`${result.length} users send to user ${req.body.decodedToken.id}.`);
+        res.status(200).json({data: result});
       } catch (error) {
         console.error(error);
         res.status(500).json({

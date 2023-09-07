@@ -11,18 +11,20 @@ class AdminRouter {
   private prismaService: PrismaService = PrismaService.getInstance();
 
   private createRoute: string = '/create';
-  private removeRoute: string = '/remove';
+  private getRoute: string = '/get';
+  private searchRoute: string = '/search';
   private updateRoute: string = '/update';
 
   constructor() {
     this.router = Router();
     this.setCreateRoute();
-    this.setRemoveRoute();
+    this.setGetRoute();
+    this.setSearchRoute();
     this.setUpdateRoute();
   }
 
   private setCreateRoute = async () => {
-    this.router.post(this.createRoute, async (req: Request, res: Response) => {
+    this.router.post(this.createRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
         console.log(`Creating admin using the following data: ${JSON.stringify(req.body.data)}`);
         const admin = await this.prismaService.prisma.admin.create({
@@ -42,19 +44,83 @@ class AdminRouter {
     });
   }
 
-  private setRemoveRoute = async () => {
-    this.router.post(this.removeRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
+  private setGetRoute = async () => {
+    this.router.get(this.getRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
-        console.log(`Removing admin ${req.body.id}.`);
-        let result = await this.prismaService.prisma.admin.update({
-          where: {id: req.body.id},
-          data: {status: 'removed'},
+        let result = await this.prismaService.prisma.admin.findMany({
+          where: {
+            OR: [
+              {status: 'ok'},
+            ],
+          },
+          select: {
+            User: {
+              select: {
+                username: true,
+                UserInformation: {
+                  select: {
+                    lastname: true,
+                    firstname: true,
+                    middlename: true,
+                    suffix: true,
+                    gender: true,
+                    birthdate: true,
+                  },
+                },
+              },
+            },
+          }
         });
         if (!result) return res.status(400).send();
-        console.log(`Admin ${req.body.id} removed.`);
-        req.body.data.id = req.body.id;
-        this.logService.logEvent('remove', req.body.decodedToken.id, req.body.data);
-        res.status(200).send();
+        console.log(`${result.length} users send to user ${req.body.decodedToken.id}.`);
+        res.status(200).json({data: result});
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({
+          status: 'server error',
+          msg: error,
+        });
+      }
+    });
+  }
+
+  private setSearchRoute = async () => {
+    this.router.get(this.searchRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
+      try {
+        let result = await this.prismaService.prisma.admin.findMany({
+          where: {
+            OR: [
+              {status: 'ok'},
+            ],
+          },
+          select: {
+            User: {
+              select: {
+                username: true,
+                UserInformation: {
+                  where: {
+                    OR: [
+                      {lastname: req.body.key},
+                      {firstname: req.body.key},
+                      {middlename: req.body.key},
+                    ],
+                  },
+                  select: {
+                    lastname: true,
+                    firstname: true,
+                    middlename: true,
+                    suffix: true,
+                    gender: true,
+                    birthdate: true,
+                  },
+                },
+              }
+            }
+          },
+        });
+        if (!result) return res.status(400).send();
+        console.log(`${result.length} users send to user ${req.body.decodedToken.id}.`);
+        res.status(200).json({data: result});
       } catch (error) {
         console.error(error);
         res.status(500).json({

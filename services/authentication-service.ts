@@ -23,7 +23,7 @@ class AuthenticationService {
         where: {username: username},
       });
       if (!user) return false;
-      const passwordMatches = await this.hashService.comparePasswords(password, user.password);
+      const passwordMatches = await this.hashService.comparePasswords(password, user.password!);
       if (!passwordMatches) return false;
       return user;
     } catch (error) {

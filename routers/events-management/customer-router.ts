@@ -11,13 +11,13 @@ class CustomerRouter {
   private prismaService: PrismaService = PrismaService.getInstance();
 
   private createRoute: string = '/create';
-  private removeRoute: string = '/remove';
+  private getRoute: string = '/get';
   private updateRoute: string = '/update';
 
   constructor() {
     this.router = Router();
     this.setCreateRoute();
-    this.setRemoveRoute();
+    this.setGetRoute();
     this.setUpdateRoute();
   }
 
@@ -42,19 +42,41 @@ class CustomerRouter {
     });
   }
 
-  private setRemoveRoute = async () => {
-    this.router.post(this.removeRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
+  private setGetRoute = async () => {
+    this.router.get(this.getRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
-        console.log(`Removing customer ${req.body.id}.`);
-        let result = await this.prismaService.prisma.customer.update({
-          where: {id: req.body.id},
-          data: {status: 'removed'},
+        let result = await this.prismaService.prisma.customer.findMany({
+          where: {
+            OR: [
+              {status: 'ok'},
+            ],
+          },
+          select: {
+            id: true,
+            address: true,
+            phone: true,
+            email: true,
+            User: {
+              select: {
+                username: true,
+                UserInformation: {
+                  select: {
+                    lastname: true,
+                    firstname: true,
+                    middlename: true,
+                    suffix: true,
+                    gender: true,
+                    birthdate: true,
+                    userId: true,
+                  }
+                }
+              }
+            },
+          },
         });
         if (!result) return res.status(400).send();
-        console.log(`Customer ${req.body.id} removed.`);
-        req.body.data.id = req.body.id;
-        this.logService.logEvent('remove', req.body.decodedToken.id, req.body.data);
-        res.status(200).send();
+        console.log(`${result.length} users send to user ${req.body.decodedToken.id}.`);
+        res.status(200).json({data: result});
       } catch (error) {
         console.error(error);
         res.status(500).json({

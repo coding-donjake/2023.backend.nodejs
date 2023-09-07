@@ -71,6 +71,7 @@ enum Gender {
 }
 
 enum UserStatus {
+  nur
   unverified
   ok
   deactivated
