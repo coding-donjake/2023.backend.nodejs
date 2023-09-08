@@ -1,15 +1,15 @@
 POST http://localhost:5000/event/create
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU1MGU4NDAwLWUyOWItNDFkNC1hNzE2LTQ0NjY1NTQ0MDAwMCIsInVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6IiQyYiQxMCQwWnJJdUU2NklMYW5BL0RDd0FnM0p1OFhHeDBNd1M2OHYwUnc3SlJ6QTJ6VFUzUXJ0enA2RyIsInN0YXR1cyI6InVudmVyaWZpZWQiLCJpYXQiOjE2OTQwNzI3NjMsImV4cCI6MTY5NDE1OTE2M30.ICaZn4v2bALnaavIDF5Mg1tAb3WG6Xko85cvuRxRcbI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU1MGU4NDAwLWUyOWItNDFkNC1hNzE2LTQ0NjY1NTQ0MDAwMCIsInVzZXJuYW1lIjoiYWRtaW4iLCJwYXNzd29yZCI6IiQyYiQxMCQwWnJJdUU2NklMYW5BL0RDd0FnM0p1OFhHeDBNd1M2OHYwUnc3SlJ6QTJ6VFUzUXJ0enA2RyIsInN0YXR1cyI6InVudmVyaWZpZWQiLCJpYXQiOjE2OTQxMzU0NTEsImV4cCI6MTY5NDIyMTg1MX0.9AC-EgmYn2tNFsTj9H6o4MOvtIzDN-3tBo7-gBzooNM
 Content-Type: application/json
 
 {
   "data": {
-    "userId": "fe99dc63-fa2d-4bfa-86db-165866b080d5",
+    "datetimeStart": "2000-01-01T00:00:00Z",
+    "datetimeEnd": "2000-01-01T00:00:00Z",
+    "type": "party",
+    "name": "sallys's birthday party",
     "address": "bacolod city",
-    "phone": "09123456789",
-    "email": "sample@email.com",
-    "phone": "09123456789",
-    "email": "sample@email.com"
+    "customerId": "20182453-a031-438e-b186-bdd0603de47e"
   }
 }
 
@@ -26,10 +26,13 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU1MGU4NDAwL
 Content-Type: application/json
 
 {
-  "id": "20182453-a031-438e-b186-bdd0603de47e",
+  "id": "b102e014-0963-407d-81b0-5657b2f095de",
   "data": {
+    "datetimeStart": "2000-01-01T00:00:00Z",
+    "datetimeEnd": "2000-01-01T00:00:00Z",
+    "type": "party",
+    "name": "john's birthday party",
     "address": "bacolod city",
-    "phone": "09123456789",
-    "email": "sample@email.com"
+    "customerId": "20182453-a031-438e-b186-bdd0603de47e"
   }
 }
