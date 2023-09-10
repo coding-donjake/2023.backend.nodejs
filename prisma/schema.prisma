@@ -106,6 +106,7 @@ model Borrowing {
 enum AssetStatus {
   good
   broken
+  removed
 }
 
 enum BorrowingStatus {

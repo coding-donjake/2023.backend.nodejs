@@ -11,6 +11,7 @@ import OrderRouter from './routers/events-management/order-router';
 import OrderSupplyRouter from './routers/events-management/order-supply-router';
 import SupplierRouter from './routers/events-management/supplier-router';
 import TaskRouter from './routers/events-management/task-router';
+import AssetRouter from './routers/assets-management/asset-router';
 
 class App {
   static instance: App;
@@ -23,6 +24,10 @@ class App {
   private adminRouter: AdminRouter;
   private userRouter: UserRouter;
   private userInformationRouter: UserInformationRouter;
+
+  // assets management system
+  private assetRoute: string = '/asset';
+  private assetRouter: AssetRouter;
 
   // events management system
   private customerRoute: string = '/customer';
@@ -54,6 +59,11 @@ class App {
 
     this.userInformationRouter = new UserInformationRouter();
     this.express.use(this.userInformationRoute, this.userInformationRouter.router);
+
+    // assets management system
+
+    this.assetRouter = new AssetRouter();
+    this.express.use(this.assetRoute, this.assetRouter.router);
 
     // events management system
 

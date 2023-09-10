@@ -4,7 +4,7 @@ import AuthenticationService from '../../services/authentication-service';
 import LogService from '../../services/log-service';
 import PrismaService from '../../services/prisma-service';
 
-class EventRouter {
+class BorrowingRouter {
   public router: Router;
   private authService: AuthenticationService = AuthenticationService.getInstance();
   private logService: LogService = LogService.getInstance();
@@ -24,14 +24,14 @@ class EventRouter {
   private setCreateRoute = async () => {
     this.router.post(this.createRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
-        console.log(`Creating event using the following data: ${JSON.stringify(req.body.data)}`);
-        const event = await this.prismaService.prisma.event.create({
+        console.log(`Creating borrowing using the following data: ${JSON.stringify(req.body.data)}`);
+        const borrowing = await this.prismaService.prisma.borrowing.create({
           data: req.body.data,
         });
-        console.log(`Event created: ${JSON.stringify(event)}`);
-        req.body.data.id = event.id;
+        console.log(`Borrowing created: ${JSON.stringify(borrowing)}`);
+        req.body.data.id = borrowing.id;
         this.logService.logEvent('create', req.body.decodedToken.id, req.body.data);
-        res.status(200).json({ id: event.id });
+        res.status(200).json({ id: borrowing.id });
       } catch (error) {
         console.error(error);
         res.status(500).json({
@@ -45,39 +45,42 @@ class EventRouter {
   private setGetRoute = async () => {
     this.router.get(this.getRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
-        let result = await this.prismaService.prisma.event.findMany({
+        let result = await this.prismaService.prisma.borrowing.findMany({
           where: {
-            OR: req.body.or,
+            OR: [
+              {status: 'pending'},
+              {status: 'borrowed'},
+            ],
           },
           select: {
             id: true,
-            datetimeStart: true,
-            datetimeEnd: true,
-            type: true,
-            name: true,
-            address: true,
+            datetimeBorrowed: true,
+            datetimeReturned: true,
+            remarksBorrowed: true,
+            remarksReturned: true,
             status: true,
-            Customer: {
+            Asset: {
               select: {
-                address: true,
-                phone: true,
-                email: true,
+                id: true,
+                name: true,
+                brand: true,
+                type: true,
                 status: true,
-                User: {
+              },
+            },
+            User: {
+              select: {
+                username: true,
+                UserInformation: {
                   select: {
-                    username: true,
-                    UserInformation: {
-                      select: {
-                        lastname: true,
-                        firstname: true,
-                        middlename: true,
-                        suffix: true,
-                        gender: true,
-                        birthdate: true,
-                        userId: true,
-                      }
-                    }
-                  }
+                    lastname: true,
+                    firstname: true,
+                    middlename: true,
+                    suffix: true,
+                    gender: true,
+                    birthdate: true,
+                    userId: true,
+                  },
                 },
               },
             },
@@ -99,13 +102,13 @@ class EventRouter {
   private setUpdateRoute = async () => {
     this.router.post(this.updateRoute, [this.authService.verifyToken, this.authService.verifyUser, this.authService.verifyAdmin], async (req: Request, res: Response) => {
       try {
-        console.log(`Updating event ${req.body.id} using the following data: ${JSON.stringify(req.body.data)}`);
-        let result = await this.prismaService.prisma.event.update({
+        console.log(`Updating borrowing ${req.body.id} using the following data: ${JSON.stringify(req.body.data)}`);
+        let result = await this.prismaService.prisma.borrowing.update({
           where: {id: req.body.id},
           data: req.body.data,
         });
         if (!result) return res.status(400).send();
-        console.log(`Event ${req.body.id} updated.`);
+        console.log(`Borrowing ${req.body.id} updated.`);
         req.body.data.id = req.body.id;
         this.logService.logEvent('update', req.body.decodedToken.id, req.body.data);
         res.status(200).send();
@@ -120,4 +123,4 @@ class EventRouter {
   }
 }
 
-export default EventRouter;
+export default BorrowingRouter;
